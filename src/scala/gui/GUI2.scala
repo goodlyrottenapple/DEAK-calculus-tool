@@ -352,8 +352,15 @@ object GUI2 extends SimpleSwingApplication {
 	}
 
 	val ptListPopupMenu = new scala.swing.PopupMenu {
-		contents += new MenuItem(swing.Action("Add as assumption") {
+		contents += new MenuItem(swing.Action("Add root as assumption") {
 			session.addAssmFromSelPT()
+		})
+
+		contents += new MenuItem(swing.Action("Duplicate tree") {
+			var sel = session.ptListView.selection.items.head
+			session.addPT(sel._2)
+			session.ptListView.revalidate()
+			session.ptListView.repaint()
 		})
 
 		contents += new MenuItem(swing.Action("Delete tree") {
@@ -361,6 +368,10 @@ object GUI2 extends SimpleSwingApplication {
 			session.ptListView.revalidate()
 			session.ptListView.repaint()
 		})
+
+		contents += new MenuItem(swing.Action("Create Rule Macro") {
+    		session.rulifyPT()
+  		})
 
 		contents += new MenuItem(swing.Action("Export tree to LaTeX") {
 			session.exportLatexFromSelPT()
@@ -390,6 +401,88 @@ object GUI2 extends SimpleSwingApplication {
 			}
 		})
 	}
+
+	// macros & abbrevs ----------------------------
+
+
+	// val macroAdd = new Button("ADD"){
+	// 	border = Swing.EmptyBorder(0,0,0,20)
+	// 	font = new Font("Roboto-BOLD", Font.BOLD, 12)
+	// 	foreground = sideBarColor
+	// }
+	session.macroListView.background = sideBarColorLight
+
+
+	val macroLoad = new Button("LOAD"){
+		border = Swing.EmptyBorder(0,0,0,20)
+		font = new Font("Roboto-BOLD", Font.BOLD, 12)
+		foreground = sideBarColor
+	}
+
+
+	val macroSave = new Button("SAVE"){
+		border = Swing.EmptyBorder(0,0,0,0)
+		font = new Font("Roboto-BOLD", Font.BOLD, 12)
+		foreground = sideBarColor
+	}
+
+	val macroBar = new BorderPanel {
+		layout(new BoxPanel(Orientation.Horizontal) {
+			contents+= new Label("Macros"){
+				font = new Font("Roboto-Light", Font.PLAIN, 16)
+				foreground = textColor2
+				border = Swing.EmptyBorder(15, 10, 15, 20)
+				//preferredSize = new Dimension(400, 50)
+			}
+			contents+= macroLoad
+			contents+= macroSave
+		}) = North
+		layout(new PrettyScrollPane(session.macroListView){scrollPane.peer.getViewport().setBackground(sideBarColorLight)}) = Center
+	}
+
+	val tab2 = new BoxPanel(Orientation.Vertical) {
+		contents+= macroBar
+		// contents+= preFormBar
+		background = sideBarColor2
+	}
+
+
+	session.macroListView.listenTo(session.macroListView.mouse.clicks)
+	session.macroListView.reactions += {
+		case m : MouseClicked if !session.macroListView.selection.items.isEmpty && m.clicks == 2 => 
+			val sel = session.macroListView.selection.items.head
+			new MacroAddDialog(macroName = sel._1, pt=sel._2, adding=false)
+		case m : MouseClicked if m.peer.getButton == MouseEvent.BUTTON3 => 
+			val row = session.macroListView.peer.locationToIndex(m.peer.getPoint)
+			if(row != -1) session.macroListView.peer.setSelectedIndex(row)
+			//if(!session.macroListView.selection.items.isEmpty) popupMacro.peer.show(m.peer.getComponent, m.peer.getX, m.peer.getY)
+	}
+
+
+	listenTo(macroLoad, macroSave)
+
+	reactions+={
+		case ButtonClicked(`macroLoad`) => 
+			GUIHelper.fileOpenDialog("Open a macro file") match {
+				case Some(file) => GUIHelper.openMacroFile(file, session)
+				case None => ;
+			}
+		case ButtonClicked(`macroSave`) => 
+			GUIHelper.fileSaveDialog("Save a macro file") match {
+				case Some(file) => GUIHelper.saveMacroFile(file, session)
+				case None => ;
+			}
+	}
+
+
+	listenTo(session.macroListView.keys)
+	reactions += {
+		case KeyReleased(session.macroListView, Key.BackSpace, _, _) => session.removeMacrosLV
+		case KeyReleased(session.macroListView, Key.Delete, _, _) => session.removeMacrosLV
+	}
+
+
+
 
 	// relaka and preform --------------------------
 
@@ -541,7 +634,7 @@ object GUI2 extends SimpleSwingApplication {
 
 
 	tabPane.addTab(null, tab1.peer)
-	tabPane.addTab(null, new JButton("aaaaaaa"))
+	tabPane.addTab(null, tab2.peer)
 	tabPane.addTab(null, tab3.peer)
 
 
@@ -552,7 +645,7 @@ object GUI2 extends SimpleSwingApplication {
 	labTab1.setForeground(textColor)
 	tabPane.setTabComponentAt(0, labTab1) // For component1
 
-	val labTab2 = new JLabel("Abbreviations")
+	val labTab2 = new JLabel("Abbreviations & Macros")
 	labTab2.setUI(new VerticalLabelUI(true))
 	labTab2.setFont(new Font("Roboto-Bold", Font.BOLD, 12))
 	labTab2.setForeground(textColor)
