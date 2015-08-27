@@ -105,6 +105,23 @@ object GUIHelper {
           case _ => 
         }
         /*uncommentR?Action?Agent-BEGIN*//*/*uncommentR?Action?Agent-END*/*/
+
+        map.get("abbrev") match {
+          case LLS(abbrev) =>
+            session.clearAbbrev
+            for (a <- abbrev){
+              if(a.length == 2) {
+                val name = a(0)
+                val structure = parseStructure(a(1))
+                if (structure != None) {
+                  print("abbrev:")
+                  println(a)
+                  session.addAbbrev(name, structure.get)
+                }
+              }
+            }
+          case _ => 
+        }
       case _ => 
     }
   }
@@ -226,11 +243,13 @@ def saveCSFile(file:java.io.File, session:CalcSession) = {
           Map( 
             "assms" -> JSONArray( session.assmsBuffer.toList.map{case (i,s) => sequentToString(s, PrintCalc.ASCII)} )
             ,"pts"   -> JSONArray( session.ptBuffer.toList.map{ case (i,s) => JSONObject(savePT(s)) } )
+            ,"abbrev"  -> JSONArray( session.flattenAbbrevStr.map(JSONArray) )
             /*/*uncommentL?Action?Agent-BEGIN*/*//*uncommentL?Action?Agent-END*/
             ,"relAKA"  -> JSONArray( session.flattenRelAKAStr.map(JSONArray) )
             ,"preForm"  -> JSONArray( session.flattenPreFormStr.map(JSONArray) )
-            /*uncommentR?Action?Agent-BEGIN*//*/*uncommentR?Action?Agent-END*/*/ ) )
-          .toString())
+            /*uncommentR?Action?Agent-BEGIN*//*/*uncommentR?Action?Agent-END*/*/
+          ) 
+        ).toString())
       p.close
       // session.ptBuffer.toList(0) match {
       //   case (i,s) => println(JSONObject(savePT(s)).toString())
