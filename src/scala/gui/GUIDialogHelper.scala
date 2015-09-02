@@ -268,7 +268,7 @@ class ParsePopup[T](parser:String => Option[T], toStr:T => String, t:String) ext
 	layout(new FlowPanel(FlowPanel.Alignment.Right)( cancelButton, okButton ){opaque = false}) = South //{ cancel(); close() } )) = South
 }
 
-
+/*/*uncommentL?Action?Agent-BEGIN*/*//*uncommentL?Action?Agent-END*/
 class RelAKAParsePopup extends BorderPanel with Popup {
 	override def close() = {
 		visible = false
@@ -522,7 +522,7 @@ class PreFormParsePopup extends BorderPanel with Popup  {
 
 	layout(new FlowPanel(FlowPanel.Alignment.Right)( cancelButton, okButton ){opaque = false}) = South //{ cancel(); close() } )) = South
 }
-
+/*uncommentR?Action?Agent-BEGIN*//*/*uncommentR?Action?Agent-END*/*/
 
 
 class AbbrevParsePopup extends BorderPanel with Popup  {
