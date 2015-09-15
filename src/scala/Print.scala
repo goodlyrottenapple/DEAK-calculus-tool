@@ -317,7 +317,7 @@ object PrintCalc{
 		case LATEX =>
 			in match {
 				case Sequent_Structure(a) => structureToString(a, format)
-				case Sequenta(a,b) => structureToString(a, format) + " " + "{\\ {\\textcolor{magenta}\\boldsymbol{\\vdash}\\ }" + " " + structureToString(b, format)
+				case Sequenta(a,b) => structureToString(a, format) + " " + "{\\" + " " + "{\\textcolor{magenta}\\boldsymbol{\\vdash}\\" + " " + "}" + " " + structureToString(b, format)
 			}
 		case ISABELLE =>
 			in match {

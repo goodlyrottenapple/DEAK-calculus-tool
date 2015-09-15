@@ -301,15 +301,15 @@ begin
 
   fun freevars_Structure :: "Structure \<Rightarrow> Structure set"
   where
-(*(*uncommentL?Structure_Formula-BEGIN*)*)(*uncommentL?Structure_Formula-END*)  "freevars_Structure (Structure_Formula var) = image (\<lambda>x. Structure_Formula x) (freevars var)" |(*uncommentR?Structure_Formula-BEGIN*)(*(*uncommentR?Structure_Formula-END*)*)
-(*(*uncommentL?Structure_Bin-BEGIN*)*)(*uncommentL?Structure_Bin-END*)  "freevars_Structure (Structure_Bin var1 _ var2) = (freevars var1) \<union> (freevars var2)" |(*uncommentR?Structure_Bin-BEGIN*)(*(*uncommentR?Structure_Bin-END*)*)
-(*(*uncommentL?Structure_Freevar-BEGIN*)*)(*uncommentL?Structure_Freevar-END*)  "freevars_Structure (Structure_Freevar var) = {(Structure_Freevar var)}" |(*uncommentR?Structure_Freevar-BEGIN*)(*(*uncommentR?Structure_Freevar-END*)*)
-(*(*uncommentL?Structure_Action_Structure-BEGIN*)*)(*uncommentL?Structure_Action_Structure-END*)  "freevars_Structure (Structure_Action_Structure _ act1 struct) = image (\<lambda>x. Structure_Formula (Formula_Action x)) (freevars act1) \<union> (freevars struct)" | (*uncommentR?Structure_Action_Structure-BEGIN*)(*(*uncommentR?Structure_Action_Structure-END*)*)
-(*(*uncommentL?Structure_Agent_Structure-BEGIN*)*)(*uncommentL?Structure_Agent_Structure-END*)  "freevars_Structure (Structure_Agent_Structure _ ag1 struct) = image (\<lambda>x. Structure_Formula (Formula_Agent x)) (freevars ag1) \<union> (freevars struct)" | (*uncommentR?Structure_Agent_Structure-BEGIN*)(*(*uncommentR?Structure_Agent_Structure-END*)*)
-(*(*uncommentL?Structure_Phi-BEGIN*)*)(*uncommentL?Structure_Phi-END*)  "freevars_Structure (Structure_Phi act1) = image (\<lambda>x. Structure_Formula (Formula_Action x)) (freevars act1)" | (*uncommentR?Structure_Phi-BEGIN*)(*(*uncommentR?Structure_Phi-END*)*)
-(*(*uncommentL?Structure_Bigcomma-BEGIN*)*)(*uncommentL?Structure_Bigcomma-END*)  "freevars_Structure (Structure_Bigcomma list) = foldr (op \<union>) (map freevars list) {}" | (*uncommentR?Structure_Bigcomma-BEGIN*)(*(*uncommentR?Structure_Bigcomma-END*)*)
+(*(*uncommentL?Structure_Formula-BEGIN*)*)(*uncommentL?Structure_Formula-END*)  "freevars_Structure (Structure_Formula var) = image (\<lambda>x. Structure_Formula x) (freevars var)"(*uncommentR?Structure_Formula-BEGIN*)(*(*uncommentR?Structure_Formula-END*)*)
+(*(*uncommentL?Structure_Bin-BEGIN*)*)(*uncommentL?Structure_Bin-END*) | "freevars_Structure (Structure_Bin var1 _ var2) = (freevars var1) \<union> (freevars var2)"(*uncommentR?Structure_Bin-BEGIN*)(*(*uncommentR?Structure_Bin-END*)*)
+(*(*uncommentL?Structure_Freevar-BEGIN*)*)(*uncommentL?Structure_Freevar-END*) | "freevars_Structure (Structure_Freevar var) = {(Structure_Freevar var)}"(*uncommentR?Structure_Freevar-BEGIN*)(*(*uncommentR?Structure_Freevar-END*)*)
+(*(*uncommentL?Structure_Action_Structure-BEGIN*)*)(*uncommentL?Structure_Action_Structure-END*) | "freevars_Structure (Structure_Action_Structure _ act1 struct) = image (\<lambda>x. Structure_Formula (Formula_Action x)) (freevars act1) \<union> (freevars struct)"(*uncommentR?Structure_Action_Structure-BEGIN*)(*(*uncommentR?Structure_Action_Structure-END*)*)
+(*(*uncommentL?Structure_Agent_Structure-BEGIN*)*)(*uncommentL?Structure_Agent_Structure-END*) | "freevars_Structure (Structure_Agent_Structure _ ag1 struct) = image (\<lambda>x. Structure_Formula (Formula_Agent x)) (freevars ag1) \<union> (freevars struct)" (*uncommentR?Structure_Agent_Structure-BEGIN*)(*(*uncommentR?Structure_Agent_Structure-END*)*)
+(*(*uncommentL?Structure_Phi-BEGIN*)*)(*uncommentL?Structure_Phi-END*) | "freevars_Structure (Structure_Phi act1) = image (\<lambda>x. Structure_Formula (Formula_Action x)) (freevars act1)" (*uncommentR?Structure_Phi-BEGIN*)(*(*uncommentR?Structure_Phi-END*)*)
+(*(*uncommentL?Structure_Bigcomma-BEGIN*)*)(*uncommentL?Structure_Bigcomma-END*) | "freevars_Structure (Structure_Bigcomma list) = foldr (op \<union>) (map freevars list) {}" (*uncommentR?Structure_Bigcomma-BEGIN*)(*(*uncommentR?Structure_Bigcomma-END*)*)
+(*(*uncommentL?Structure_Zer-BEGIN*)*)(*uncommentL?Structure_Zer-END*)  | "freevars_Structure (Structure_Zer _) = {}" (*uncommentR?Structure_Zer-BEGIN*)(*(*uncommentR?Structure_Zer-END*)*)
 
-  "freevars_Structure _ = {}"
 
   primrec replace_Structure_aux :: "Structure \<Rightarrow> Structure \<Rightarrow> Structure \<Rightarrow> Structure" (*(*uncommentL?Structure_Bigcomma-BEGIN*)*)(*uncommentL?Structure_Bigcomma-END*)and replace_Structure_list_aux :: "Structure \<Rightarrow> Structure \<Rightarrow> Structure list \<Rightarrow> Structure list"(*uncommentR?Structure_Bigcomma-BEGIN*)(*(*uncommentR?Structure_Bigcomma-END*)*)
   where
