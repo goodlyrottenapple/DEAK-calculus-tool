@@ -176,17 +176,23 @@ datatype ruleder = ruleder      Sequent "Sequent \<Rightarrow> Sequent list opti
 
 
 (*(*uncommentL?Atprop?Formula?Formula_Atprop?Formula_Action_Formula-BEGIN*)*)(*uncommentL?Atprop?Formula?Formula_Atprop?Formula_Action_Formula-END*)
+(*This function is an auxillary function which tries to unwrap any Structure_Action_Structure constructors and 
+will return an Atprop if the structure contains no other constructors otherwise it will return None*)
 fun is_act_mod :: "Structure \<Rightarrow> Atprop option" where
 "is_act_mod (Structure_Formula (Formula_Atprop p)) = Some p"|
 "is_act_mod (Structure_Action_Structure _ _ s) = is_act_mod s"|
 "is_act_mod _ = None"
 
+(*The atom function is used by the atom rule. to check that the sequent is of a certain form.*)
 fun atom :: "Sequent \<Rightarrow> bool" where
 "atom (l \<turnstile>\<^sub>S r) = ( (is_act_mod l) \<noteq> None \<and> (is_act_mod l) = (is_act_mod r) )"|
 "atom _ = False"
 (*uncommentR?Atprop?Formula?Formula_Atprop?Formula_Action_Formula-BEGIN*)(*(*uncommentR?Atprop?Formula?Formula_Atprop?Formula_Action_Formula-END*)*)
 
 (*(*uncommentL?Action?Action_Freevar?Agent?Agent_Freevar?Formula_Action?Formula_Agent?Sequent_Structure?Sequent-BEGIN*)*)(*uncommentL?Action?Action_Freevar?Agent?Agent_Freevar?Formula_Action?Formula_Agent?Sequent_Structure?Sequent-END*)
+(*relAKACheck takes in a an action structure and a list deconstructed parts of a sequent and checks
+whether the list contains an Action alpha, Agent a and Action beta that are in the action structure*)
+
 fun relAKACheck :: "(Action \<Rightarrow> Agent => Action list) \<Rightarrow> ((Sequent \<times> Sequent) list) \<Rightarrow> bool" where
 "relAKACheck fun mlist = (case List.find ( \<lambda>(x::Sequent \<times> Sequent). fst x = Sequent_Structure (Formula_Action (?\<^sub>Act ''alpha'') \<^sub>S) ) mlist of 
                    Some (_, Sequent_Structure (Formula_Action alpha \<^sub>S)) \<Rightarrow> 
@@ -203,6 +209,7 @@ fun swapin :: "(Action \<Rightarrow> Agent => Action list) \<Rightarrow> Sequent
 (*uncommentR?Action?Action_Freevar?Agent?Agent_Freevar?Formula_Action?Formula_Agent?Sequent_Structure?Sequent-BEGIN*)(*(*uncommentR?Action?Action_Freevar?Agent?Agent_Freevar?Formula_Action?Formula_Agent?Sequent_Structure?Sequent-END*)*)
 
 (*(*uncommentL?Structure_Bigcomma-BEGIN*)*)(*uncommentL?Structure_Bigcomma-END*)
+(* These are custom rules for the bigcomma *)
 fun bigcomma_cons_L :: "Sequent \<Rightarrow> Sequent list option" where
 "bigcomma_cons_L ( (B\<^sub>S X (;\<^sub>S) (;;\<^sub>S Xs)) \<turnstile>\<^sub>S Y ) = Some [(;;\<^sub>S (X#Xs) \<turnstile>\<^sub>S Y)]"|
 "bigcomma_cons_L _ = None"
@@ -491,6 +498,7 @@ primrec consq :: "Sequent \<Rightarrow> Structure" where
 "consq (Sequent_Structure x) = x"
 
 
+(*collectPremises returns all the leaves of a prooftree where the Prem rule has been applied *)
 fun collectPremises :: "Prooftree \<Rightarrow> Sequent list" where
 "collectPremises (Prooftree p (RuleZer Prem) []) = [p]" |
 "collectPremises (Prooftree _ (RuleMacro _ pt) list) = foldr append (map collectPremises list) []" |
@@ -498,6 +506,9 @@ fun collectPremises :: "Prooftree \<Rightarrow> Sequent list" where
 
 fun collectPremisesToLocale :: "Prooftree \<Rightarrow> Locale list" where
 "collectPremisesToLocale pt = map Premise (collectPremises pt)"
+
+(*collectCutFormulas returns all cut formulas used in a prooftree,
+by checking for a matching branch on the left and the right hand side of the turnstyle of the two leaves *)
 
 fun collectCutFormulas :: "Prooftree \<Rightarrow> Formula list" where
 "collectCutFormulas (Prooftree _ (RuleCut _) [l, r]) = (
@@ -548,7 +559,10 @@ lemma Atprop_without_Freevar[simp]: "\<And>a. freevars a = {} \<Longrightarrow> 
   by (metis Atprop.exhaust freevars_Atprop.simps(1) insert_not_empty)
 
 
-(* These deifnitions are used for creating macros in the UI *)
+(* The rulify_ definitions are used for creating macros in the UI,
+by turning a proof tree of concrete terms into a proof tree containing free variables.
+This is done by converting every leaf of a Sequent into a Freevar term of the highest level of that term 
+(i.e. if a sequent contains an atprop it it will be turned into a sequent freevar). *)
 
 (*(*uncommentL?Agent?Agent_Freevar-BEGIN*)*)(*uncommentL?Agent?Agent_Freevar-END*)
 primrec rulifyAgent :: "Agent \<Rightarrow> Agent" where
@@ -589,6 +603,9 @@ fun rulifyFormula :: "Formula \<Rightarrow> Formula" where
 (*uncommentR?Formula-BEGIN*)(*(*uncommentR?Formula-END*)*)
 
 (*(*uncommentL?Structure-BEGIN*)*)(*uncommentL?Structure-END*)
+(*if the leaf is a formula with a name beginning with 'F', 
+the term will be turned into a Formula_Freevar, else it will become a Structure_Freevar*)
+
 fun rulifyStructure :: "Structure \<Rightarrow> Structure" where
 (*(*uncommentL?Structure_Formula?Formula_Atprop-BEGIN*)*)(*uncommentL?Structure_Formula?Formula_Atprop-END*)
 "rulifyStructure (Structure_Formula (Formula_Atprop(Atprop (f#a)))) = 
@@ -628,6 +645,10 @@ fun rulifyProoftree :: "Prooftree \<Rightarrow> Prooftree" where
 "rulifyProoftree (Prooftree s (RuleMacro str pt) list) = Prooftree (rulifySequent s) (RuleMacro str (rulifyProoftree pt)) (map rulifyProoftree list)" |
 "rulifyProoftree (Prooftree s r list) = (Prooftree (rulifySequent s) r (map rulifyProoftree list))"
 
+
+(*This function is used to replace any freevar terms in a sequent by a given term, but does this throughout a whole prooftree.
+The function is used when applying a macro, where the freevars are substituted by concrete terms of the sequent that the macro is being used on *)
+
 fun replaceSequentIntoPT_aux :: "(Sequent \<times> Sequent) list \<Rightarrow> Prooftree \<Rightarrow> Prooftree" and 
   replaceSequentIntoPT_list :: "(Sequent \<times> Sequent) list \<Rightarrow> Prooftree list \<Rightarrow> Prooftree list" where 
 "replaceSequentIntoPT_aux list (Prooftree c (RuleMacro s pt) ptlist) = Prooftree (replaceAll list c) (RuleMacro s (replaceSequentIntoPT_aux list pt)) (replaceSequentIntoPT_list list ptlist)" |
@@ -638,6 +659,7 @@ fun replaceSequentIntoPT_aux :: "(Sequent \<times> Sequent) list \<Rightarrow> P
 fun replaceSequentIntoPT :: "Sequent \<Rightarrow> Prooftree \<Rightarrow> Prooftree" where
 "replaceSequentIntoPT seq (Prooftree c r ptlist) = replaceSequentIntoPT_aux (match c seq) (Prooftree c r ptlist)"
 
+(* The following two functions are used to turn a pt containing macros into a one which doesnt, by merging any proof trees found in RulMacro into the main pt*)
 fun replacePTIntoPT :: "Prooftree list \<Rightarrow> Prooftree \<Rightarrow> Prooftree"  where
 "replacePTIntoPT [] (Prooftree s (RuleZer Prem) []) = (Prooftree s (RuleZer Prem) [])" |
 "replacePTIntoPT (l#ist) (Prooftree s (RuleZer Prem) []) = (if (concl l) = s then l else replacePTIntoPT ist (Prooftree s (RuleZer Prem) []))" |
@@ -710,6 +732,7 @@ lemma polarity_weird_and_comm: "a \<and>p b = b \<and>p a"
 apply (cases a, (cases b, auto)+)
 done
 
+(*this function defines the polarity of the different structural connectives in the display calculus*)
 fun structure_Op_polarity :: "Structure_Bin_Op \<Rightarrow> (polarity \<times> polarity)" where
 (*(*uncommentL?Structure_Comma-BEGIN*)*)(*uncommentL?Structure_Comma-END*) 
    "structure_Op_polarity Structure_Comma = (+p, +p)"
@@ -739,6 +762,9 @@ fun polarity_Sequent :: "Structure \<Rightarrow> Sequent \<Rightarrow> polarity"
 "polarity_Sequent s (Sequent lhs rhs) = (\<not>p(polarity_Structure s lhs)) \<or>p (polarity_Structure s rhs)" |
 "polarity_Sequent s _ = N"
 
+(*given a structure s we want to isolate and another structure s', where s is a subterm of s', 
+this function will return a subterm of s' which has had the top most constructor removed. 
+ie if s' = A ; Forw x B and s = B, partial_goal will return Forw x B*)
 fun partial_goal :: "Structure \<Rightarrow> Structure \<Rightarrow> Structure" where
 (*(*uncommentL?Structure_Bin-BEGIN*)*)(*uncommentL?Structure_Bin-END*) 
 "partial_goal s (Structure_Bin l oper r) = (case (polarity_Structure s l) of N \<Rightarrow> (if s = l then l else r) | _ \<Rightarrow> l)" |
@@ -790,7 +816,7 @@ apply auto
 apply (metis polarity.exhaust polarity.simps(7) polarity.simps(8) polarity.simps(9))+
 done
 
-
+(*checks the polarity of a structure inside a sequent*)
 fun position_in_Sequent :: "Structure \<Rightarrow> Sequent \<Rightarrow> polarity" where
 "position_in_Sequent s (Sequent l r) = (
   if s = l then -p
@@ -801,7 +827,8 @@ fun position_in_Sequent :: "Structure \<Rightarrow> Sequent \<Rightarrow> polari
 "position_in_Sequent s _ = N"
 
 
-
+(*the following functions are used to create fresh names for an atprop, given a sequent. 
+These functions are used by the ui for the display_tac tactic*)
 fun fresh_name_aux :: "string list \<Rightarrow> string \<Rightarrow> string set \<Rightarrow> string" where
 "fresh_name_aux [] s _ = s" |
 "fresh_name_aux (x#xs) s full = (if (s@x) \<notin> full then s@x else (fresh_name_aux xs (s@x) full) )"
