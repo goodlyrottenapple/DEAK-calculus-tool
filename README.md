@@ -6,4 +6,4 @@ No Isabelle installation is required, however, to run the UI, [Scala](http://www
 
 To run, first download the project or clone it via git, navigate to the project folder in terminal and run `./build.py` to compile the Scala and Java classes. Once compiled, run `make gui` to launch the UI.
 
-The formalization of the strucutre and the rules of the D.EAK calculus is encoded in a [JSON file](http://github.com/goodlyrottenapple/calculus-toolbox/blob/master/DEAK.json) found in the [calculus-toolbox repository](http://github.com/goodlyrottenapple/calculus-toolbox/)
+The formalization of the structure and the rules of the D.EAK calculus is encoded in a [JSON file](http://github.com/goodlyrottenapple/calculus-toolbox/blob/master/DEAK.json) found in the [calculus-toolbox repository](http://github.com/goodlyrottenapple/calculus-toolbox/)
