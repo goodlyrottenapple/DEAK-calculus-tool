@@ -53,7 +53,7 @@ Bigcomma_Cons_R: "l \<turnstile>d (Y \<turnstile>\<^sub>S ;;\<^sub>S(X # Xs)) \<
 Bigcomma_Cons_L2: "l \<turnstile>d (X ;\<^sub>S (;;\<^sub>S Xs) \<turnstile>\<^sub>S Y) \<Longrightarrow> l \<turnstile>d (;;\<^sub>S(X # Xs) \<turnstile>\<^sub>S Y)"|
 Bigcomma_Cons_L: "l \<turnstile>d (;;\<^sub>S(X # Xs) \<turnstile>\<^sub>S Y) \<Longrightarrow> l \<turnstile>d (X ;\<^sub>S (;;\<^sub>S Xs) \<turnstile>\<^sub>S Y)"
 | 
-SingleCut: "(CutFormula f) \<in> set l \<Longrightarrow> l \<turnstile>d (X \<turnstile>\<^sub>S f \<^sub>S) \<Longrightarrow> l \<turnstile>d (f \<^sub>S \<turnstile>\<^sub>S Y) \<Longrightarrow> l \<turnstile>d (X \<turnstile>\<^sub>S Y)"
+SingleCut: "(CutFormula f) \<in> set l \<Longrightarrow> l \<turnstile>d ((f \<^sub>S) \<turnstile>\<^sub>S Y) \<Longrightarrow> l \<turnstile>d (X \<turnstile>\<^sub>S (f \<^sub>S)) \<Longrightarrow> l \<turnstile>d (X \<turnstile>\<^sub>S Y)"
 | 
 Comma_impL_disp: "l \<turnstile>d ((X ;\<^sub>S Y) \<turnstile>\<^sub>S Z) \<Longrightarrow> l \<turnstile>d (X \<turnstile>\<^sub>S (Z \<leftarrow>\<^sub>S Y))"|
 Comma_impR_disp2: "l \<turnstile>d (Y \<turnstile>\<^sub>S (X \<rightarrow>\<^sub>S Z)) \<Longrightarrow> l \<turnstile>d ((X ;\<^sub>S Y) \<turnstile>\<^sub>S Z)"|
