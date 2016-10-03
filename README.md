@@ -1,3 +1,5 @@
+## This is the 2015 branch, to be used with Isabelle 2015. Switch to the master branch for the latest version.
+
 # DEAK-calculus-tool
 This is the compiled version of the D.EAK calculus using the Calculus toolbox, consisting of the shallow and deep Isabelle embeddings and the UI for manipulating proof tress o the D.EAK calculus.
 
